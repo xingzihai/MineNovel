@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MineNovel 配置管理</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="app">
+        <!-- 侧边栏 -->
+        <aside class="sidebar">
+            <div class="logo">
+                <span class="logo-icon">📚</span>
+                <span class="logo-text">MineNovel</span>
+            </div>
+            <nav class="nav">
+                <a href="#" class="nav-item active" data-page="home">
+                    <span class="nav-icon">🏠</span>
+                    <span>首页</span>
+                </a>
+                <a href="#" class="nav-item" data-page="models">
+                    <span class="nav-icon">🗄️</span>
+                    <span>模型池</span>
+                </a>
+                <a href="#" class="nav-item" data-page="routes">
+                    <span class="nav-icon">🔀</span>
+                    <span>模型路由</span>
+                </a>
+                <a href="#" class="nav-item" data-page="proxy">
+                    <span class="nav-icon">📊</span>
+                    <span>代理状态</span>
+                </a>
+                <a href="#" class="nav-item" data-page="test">
+                    <span class="nav-icon">🧪</span>
+                    <span>连接测试</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="proxy-indicator" id="proxyIndicator">
+                    <span class="indicator-dot"></span>
+                    <span class="indicator-text">检查中...</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- 主内容 -->
+        <main class="main">
+            <!-- 首页 -->
+            <section class="page active" id="page-home">
+                <header class="page-header">
+                    <h1>欢迎使用 MineNovel</h1>
+                </header>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">📦</div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="statTotal">0</div>
+                            <div class="stat-label">模型总数</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">✅</div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="statEnabled">0</div>
+                            <div class="stat-label">已启用</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🔀</div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="statRoutes">0</div>
+                            <div class="stat-label">路由配置</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🌐</div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="statProxy">—</div>
+                            <div class="stat-label">代理状态</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <h2>快速开始</h2>
+                    <div class="quick-start">
+                        <div class="quick-step">
+                            <span class="step-num">1</span>
+                            <span>在「模型池」中添加你的 API 模型</span>
+                        </div>
+                        <div class="quick-step">
+                            <span class="step-num">2</span>
+                            <span>在「代理状态」中启动 LiteLLM 代理</span>
+                        </div>
+                        <div class="quick-step">
+                            <span class="step-num">3</span>
+                            <span>在「连接测试」中验证配置是否正确</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 模型池 -->
+            <section class="page" id="page-models">
+                <header class="page-header">
+                    <h1>模型池管理</h1>
+                    <button class="btn btn-primary" onclick="showAddModelModal()">
+                        <span>➕</span> 添加模型
+                    </button>
+                </header>
+                <div class="models-container" id="modelsContainer">
+                    <!-- 模型卡片会动态加载 -->
+                </div>
+            </section>
+
+            <!-- 模型路由 -->
+            <section class="page" id="page-routes">
+                <header class="page-header">
+                    <h1>模型路由配置</h1>
+                </header>
+                <div class="card">
+                    <p class="hint">为不同任务类型分配模型。未设置的任务将使用默认模型。</p>
+                    <div class="routes-list" id="routesList">
+                        <!-- 路由配置会动态加载 -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- 代理状态 -->
+            <section class="page" id="page-proxy">
+                <header class="page-header">
+                    <h1>代理状态</h1>
+                </header>
+                <div class="proxy-status-card" id="proxyStatusCard">
+                    <div class="proxy-info">
+                        <div class="proxy-state">
+                            <span class="state-icon">⏳</span>
+                            <span class="state-text">检查中...</span>
+                        </div>
+                        <div class="proxy-url" id="proxyUrl">—</div>
+                    </div>
+                    <div class="proxy-actions">
+                        <button class="btn btn-primary" id="btnStartProxy" onclick="startProxy()">▶️ 启动代理</button>
+                        <button class="btn btn-secondary" id="btnStopProxy" onclick="stopProxy()" style="display:none">⏹️ 停止代理</button>
+                        <button class="btn btn-outline" onclick="refreshProxyStatus()">🔄 刷新</button>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>可用模型</h3>
+                    <div class="proxy-models" id="proxyModels">
+                        <p class="hint">代理未运行</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 连接测试 -->
+            <section class="page" id="page-test">
+                <header class="page-header">
+                    <h1>连接测试</h1>
+                </header>
+                <div class="card">
+                    <div class="form-group">
+                        <label>选择模型</label>
+                        <select id="testModelSelect" class="form-control">
+                            <option value="">加载中...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>测试消息</label>
+                        <textarea id="testMessage" class="form-control" rows="3">你好，这是一个测试。请简短回复。</textarea>
+                    </div>
+                    <button class="btn btn-primary" onclick="runTest()" id="btnTest">
+                        🚀 发送测试
+                    </button>
+                </div>
+                <div class="card" id="testResult" style="display:none">
+                    <h3>测试结果</h3>
+                    <div id="testResultContent"></div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- 添加模型弹窗 -->
+    <div class="modal" id="addModelModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">添加模型</h2>
+                <button class="modal-close" onclick="hideAddModelModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>显示名称 *</label>
+                        <input type="text" id="modelName" class="form-control" placeholder="例如：GPT-4o 主力">
+                    </div>
+                    <div class="form-group">
+                        <label>唯一标识 *</label>
+                        <input type="text" id="modelId" class="form-control" placeholder="例如：gpt4o-main">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>模型名称 *</label>
+                        <input type="text" id="modelType" class="form-control" placeholder="例如：gpt-4o">
+                    </div>
+                    <div class="form-group">
+                        <label>提供商</label>
+                        <select id="modelProvider" class="form-control">
+                            <option value="openai">OpenAI</option>
+                            <option value="anthropic">Anthropic</option>
+                            <option value="deepseek">DeepSeek</option>
+                            <option value="moonshot">Moonshot (Kimi)</option>
+                            <option value="zhipu">智谱 AI</option>
+                            <option value="ollama">Ollama (本地)</option>
+                            <option value="custom" selected>自定义</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>API Key</label>
+                        <input type="password" id="modelApiKey" class="form-control" placeholder="sk-...">
+                    </div>
+                    <div class="form-group">
+                        <label>API 端点</label>
+                        <input type="text" id="modelBaseUrl" class="form-control" placeholder="https://api.example.com/v1">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>分组</label>
+                        <select id="modelGroup" class="form-control">
+                            <option value="creative">✍️ 创意写作</option>
+                            <option value="analysis">🔍 分析审计</option>
+                            <option value="planning">📋 规划推理</option>
+                            <option value="character">🎭 角色扮演</option>
+                            <option value="local">💻 本地模型</option>
+                            <option value="other" selected>📦 其他</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>最大 Tokens</label>
+                        <input type="number" id="modelMaxTokens" class="form-control" value="4096">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>描述</label>
+                    <input type="text" id="modelDesc" class="form-control" placeholder="模型用途说明">
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" id="modelEnabled" checked>
+                    <label for="modelEnabled">启用模型</label>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" id="modelDefault">
+                    <label for="modelDefault">设为默认模型</label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="hideAddModelModal()">取消</button>
+                <button class="btn btn-primary" id="btnSaveModel" onclick="saveModel()">添加</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast 通知 -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>

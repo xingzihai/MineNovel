@@ -1,0 +1,9 @@
+general_settings:
+  drop_params: true
+  master_key: sk-minenovel-proxy-2024
+model_list:
+- litellm_params:
+    api_base: https://api.siliconflow.cn/v1
+    api_key: sk-zfcxidkpfrtlgrjonghckiniydhgfkqswpgxecbklfojessq
+    model: openai/Pro/deepseek-ai/DeepSeek-V3.2
+  model_name: test1
